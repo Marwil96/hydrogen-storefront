@@ -30,9 +30,13 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
     context.storefront.query(FEATURED_COLLECTION_QUERY),
     // Add other queries here, so that they are loaded in parallel
   ]);
+  const query = `*[_type == "post"][0]`;
+  const params = {id: 'home'};
+  const sanityData = await context.sanity.loadQuery(query, params);
 
   return {
     featuredCollection: collections.nodes[0],
+    sanityData,
   };
 }
 
@@ -57,10 +61,13 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  console.log('SANITY DATA', data.sanityData);
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      <h1>{data.sanityData.data?.title}</h1>
+      <p dangerouslySetInnerHTML={{__html: data.sanityData.data?.body}} />
+      {/* <FeaturedCollection collection={data.featuredCollection} /> */}
+      {/* <RecommendedProducts products={data.recommendedProducts} /> */}
     </div>
   );
 }

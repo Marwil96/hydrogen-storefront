@@ -10,7 +10,9 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
+  useLoaderData,
 } from '@remix-run/react';
+import {VisualEditing} from 'hydrogen-sanity/visual-editing';
 import favicon from '~/assets/favicon.svg';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -136,6 +138,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       return null;
     });
   return {
+    preview: context.sanity.preview,
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
@@ -177,7 +180,14 @@ export function Layout({children}: {children?: React.ReactNode}) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const data = useLoaderData<typeof loader>();
+
+  return (
+    <>
+      <Outlet />
+      {data.preview ? <VisualEditing /> : null}
+    </>
+  );
 }
 
 export function ErrorBoundary() {
